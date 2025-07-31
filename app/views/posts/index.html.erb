@@ -1,0 +1,75 @@
+<br /><br />
+<div class="d-grid gap-2 col-2 mx-auto">
+  <button class="btn btn-success btn-sm" type="button">
+    <%= current_user.name%>
+  </button>
+</div>
+<br />
+<% if current_user and current_user.avatar.attached? %>
+<%= image_tag(current_user.avatar, :transformation => { :width => 150,:height => 150, :crop => "pad" } ,class:"rounded mx-auto d-block avatar-pic") %>
+<% else %>
+  <%= image_tag('default_profile.jpg', :transformation => { :width => 150,:height => 150, :crop => "pad" } ,class:"rounded mx-auto d-block") %>
+ <% end %>
+<br />
+<div class="d-grid gap-2 col-2 mx-auto">
+  <button class="btn btn-outline-info" type="button">
+    <%= render 'home/follower_count', user: current_user %>
+  </button>
+  <button class="btn btn-outline-info " type="button">
+    <div><%= current_user.followees.count %> following</div>
+  </button>
+</div>
+<br />
+<div class="d-grid gap-2 d-md-flex profile-buttons">
+    <%= link_to "Create New Post",  new_post_path, class: "btn btn-primary"%>
+    <%= link_to "Edit Profile" ,  edit_user_registration_path, class: "btn btn-warning me-md-2" %>
+    <%= link_to "Change Avatar" ,  new_user_path, method: :get, class: "btn btn-dark me-md-2" %>
+</div>
+<div class="d-grid gap-2 d-md-flex profile-buttons">
+    <% if current_user.public? %>
+      <%= link_to "Make Profile Private", visibility_index_path, class: "btn btn-info"%>
+    <% else %>
+      <%= link_to "Make Profile Public", visibility_index_path, class: "btn btn-dark"%>
+    <% end %>
+    <%= link_to "Sent Requests",  user_requests_path(current_user.id), class: "btn btn-success"%>
+    <%= link_to "Pending Requests" ,  approves_path, class: "btn btn-secondary me-md-2" %>
+</div>
+
+<br />
+<br />
+  <h6>
+      <table class="table table-dark table-striped">
+      <tr class="text-center">
+        <th>Caption</th>
+        <th>Pics</th>
+        <th> Total Likes</th>
+        <th>Comments</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+
+  <% @posts.each do |post| %>
+
+      <tr class="text-center">
+        <td><%= post.caption%></td>
+       <td>
+          <% post.images.each do |img|  %>
+                <%= image_tag(img, :size => "260x180",:class => "rounded mx-auto d-block") %>
+          <% end %>
+        </td>
+        <td>
+          <div id="like-text-post-<%= post.id.to_s %>">
+              <%= render 'posts/like_text', post: post %>
+          </div>
+        </td>
+        <td> <%= link_to "Comment" ,post_comments_path(post.id), method: :get , class:'btn btn-info' %></td>
+        <td> <%= link_to "Edit", edit_post_path(post.id) , class:'btn btn-light' %></td>
+        <td> <%= link_to "Delete", post_path(post.id) , method: :delete , data: { confirm: 'Are you sure?' }, class:'btn btn-danger' %></td>
+
+      </tr>
+
+  <% end %>
+      </table>
+    <br />
+  </h6>
+

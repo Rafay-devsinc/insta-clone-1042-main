@@ -1,0 +1,11 @@
+<h2 class="text-center"> Edit Your Post </h2>
+<%= form_with model: @post, url: post_path(@post.id) , method: :put, local: true, validate: true do |form| %>
+
+  <div class="field form-group">
+    <%= form.text_field :caption,  placeholder: @post.caption, required: true, class:"form-control" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class:"btn btn-secondary" %>
+  </div>
+<% end %>

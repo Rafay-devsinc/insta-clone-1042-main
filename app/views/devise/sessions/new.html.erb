@@ -1,0 +1,49 @@
+<div class="container ">
+    <section class="vh-100 gradient-custom">
+      <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card bg-dark text-white" style="border-radius: 1rem;">
+              <div class="card-body p-5 text-center">
+
+                <div class="mb-md-5 mt-md-4 pb-5">
+
+                  <h2 class="fw-bold mb-2 text-uppercase">Login</h2>
+                  <p class="text-white-50 mb-5">Please enter your login and password!</p>
+
+                  <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+                    <div class="form-outline form-white mb-4">
+
+                      <%= f.email_field :email, class:"form-control",placeholder:"Email", required: true,  autofocus: true, autocomplete: "email", class: "form-control form-control-lg" %>
+                      <% f.label :email, class: "form-label" %>
+                    </div>
+
+                    <div class="form-outline form-white mb-4">
+                      <%= f.password_field :password,  class:"form-control",placeholder:"Password", required: true, autocomplete: "current-password", class: "form-control form-control-lg" %>
+                      <% f.label :password, class: "form-label" %>
+                    </div>
+
+                    <% if devise_mapping.rememberable? %>
+                      <div class="input-txt">
+                        <%= f.check_box :remember_me , class:"form-check-input ml-auto" %>
+                        <%= f.label :remember_me  %>
+                      </div>
+                    <% end %>
+
+                    <div class="actions">
+                        <%= f.submit "Log in" ,  class: "btn btn-outline-light btn-lg px-5" %>
+                    </div>
+                  <% end %>
+                  <div class="mx-auto">
+                    <br /> <br />
+                    <%= render "devise/shared/links" %>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+</div>
+

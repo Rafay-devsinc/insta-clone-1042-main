@@ -1,0 +1,41 @@
+.navbar {
+  margin-bottom: 15px;
+}
+.insta-post{
+margin-bottom: 15px;
+}
+
+.post-meta {
+  background: #fff;
+  text-align: left;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ddd;
+
+}
+
+.post-details{
+  background: #fff;
+  padding: 15px;
+  border: 1px solid #ddd;
+}
+
+.zzz{
+  float: right;
+}
+
+.post-actions{
+  margin-bottom: 20px;
+  i {
+    margin-right: 10px;
+    color: #ddd;
+    cursor: pointer;
+  }
+  i:hover{
+    color: #999;
+  }
+  i.active{
+    color: #555;
+  }
+}
+

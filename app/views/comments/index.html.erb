@@ -1,0 +1,46 @@
+
+<h2>Comments On This Post</h2>
+<h3><%= link_to "Back", users_path , class:'btn btn-primary'  %></h3>
+<br />
+<br />
+
+<div class="row g-1">
+  <%= form_tag "comments",method: :post,local: true, remote: false do %>
+  <div class="col col-4">
+    <%= text_field_tag :com_text, nil, placeholder: 'Your Comment', required: true, class:"form-control" %>
+  </div>
+  <div class="col col-2">
+    <%= hidden_field_tag :user_id, current_user.id %>
+    <br />
+    <%= submit_tag "Add Comment", class:'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<br />
+<br />
+
+  <h6>
+    <table class="table table-dark table-striped">
+      <tr>
+        <th>Username</th>
+        <th>Comment</th>
+        <th>Delete</th>
+      </tr>
+
+      <% @comments.each do |com| %>
+        <tr>
+          <td><%= com.user_name %></td>
+          <td> <%= com.comment_text %>  </td>
+          <% if com.user_id.eql? current_user.id %>
+          <td> <%= link_to "Delete", comment_path(com.id) , method: :delete, data: { confirm: 'Are you sure?' }, class:'btn btn-danger' %> </td>
+          <% else %>
+          <td> <%= link_to "Delete", '#', class:'btn btn-danger disabled' %> </td>
+          <% end %>
+        </tr>
+
+      <% end %>
+
+    </table>
+    <br />
+  </h6>

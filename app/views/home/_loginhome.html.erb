@@ -1,0 +1,30 @@
+<h1 class="text-center" >Welcome To Instagram</h1>
+
+<div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+
+        <div class="card my-5">
+          <div class="card-body cardbody-color p-lg-5">
+
+            <div class="text-center">
+              <img src="https://cdn.pixabay.com/photo/2016/08/09/17/52/instagram-1581266_1280.jpg" class="img-fluid profile-image-pic img-thumbnail rounded-circle my-3"
+                width="200px" alt="profile">
+            </div>
+
+            <div class="mb-3">
+              <div class="d-grid gap-2 col-6 mx-auto">
+                <%= link_to "Login", new_user_session_path , class: "btn btn-dark"%>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-grid gap-2 col-6 mx-auto">
+               <%= link_to "Register", new_user_registration_path, class: "btn btn-dark"%>
+               </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>

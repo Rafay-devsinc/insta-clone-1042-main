@@ -1,0 +1,13 @@
+    <br />
+  <% if !current_user%>
+    <%= render partial: "home/loginhome" %>
+  <% end %>
+
+  <br />
+  <br />
+
+  <% if current_user and current_user.avatar.attached? %>
+  <%= image_tag(current_user.avatar, :transformation => { :width => 150,:height => 150, :crop => "pad" } ,class:"rounded-pill border border-success") %>
+  <% end %>
+
+  </p>

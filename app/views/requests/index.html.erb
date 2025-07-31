@@ -1,0 +1,23 @@
+
+<h2 class="text-center">Details of Pending Requests</h2>
+<br/><br/>
+<table class="table table-striped table-bordered table-hover">
+  <thead class="thead-dark">
+    <tr class="text-center">
+      <th>User Name</th>
+      <th>Email</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @requests.each do |request| %>
+      <tr class="text-center">
+        <td><%= request.requestee.name %></td>
+        <td><%= request.requestee.email %></td>
+        <td>
+          <%= button_to "Delete Request", user_request_path(request.requestee_id,request.id), method: :delete , class: 'btn btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

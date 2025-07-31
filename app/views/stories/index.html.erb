@@ -1,0 +1,30 @@
+
+<div class="d-grid gap-2 d-md-flex">
+    <%= link_to "Create New Story",  new_story_path, class: "btn btn-primary"%>
+</div>
+
+<br />
+
+<table class="table table-dark table-striped">
+  <tr class="text-center">
+    <th>username</th>
+    <th>Story</th>
+    <th>Story Message</th>
+    <th>Delete</th>
+  </tr>
+
+  <% @stories.each do |story| %>
+
+  <tr class="text-center">
+    <td> <%= story.user.name %></td>
+    <td> <% story.images.each do |img|  %>
+            <%= image_tag(img, :size => "260x180",:class => "rounded mx-auto d-block") %>
+        <% end %>
+    </td>
+    <td><%= story.story_text%></td>
+    <td> <%= link_to "Delete", story_path(story.id) , method: :delete, data: { confirm: 'Are you sure?' } , class:'btn btn-danger' %></td>
+
+  </tr>
+
+  <% end %>
+</table>

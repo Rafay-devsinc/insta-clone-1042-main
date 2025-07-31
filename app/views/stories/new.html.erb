@@ -1,0 +1,19 @@
+
+<%= form_with model: @story, url: stories_path, method: :post, local: true, validate: true do |form| %>
+
+  <div class="field form-group">
+    <%= form.text_field :story_text,  placeholder:"Story Text", required: true,class:"form-control" %>
+  </div>
+
+  <div class="field form-group">
+    <%= form.file_field :images, multiple: true, placeholder:"Select Image or Images",required: true, class:"form-control" ,accept:'image/*' %>
+  </div>
+
+  <div class="field form-group">
+    <%= form.text_field :user_id, class:"form-control",value: current_user.id, type: :hidden %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class:"btn btn-secondary" %>
+  </div>
+<% end %>

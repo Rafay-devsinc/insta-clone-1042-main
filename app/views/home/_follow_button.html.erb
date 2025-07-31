@@ -1,0 +1,9 @@
+<%# Using following helper I made in home_helper.erb %>
+<% if following?(@user) %>
+  <%= button_to "Unfollow", home_path(id: @user.id), method: :delete , class: 'btn btn-warning'%>
+<% elsif @user.public? %>
+  <%= button_to "Follow", follow_home_path(id: @user.id), method: :post , class: 'btn btn-info' %>
+<% else%>
+  <%= button_to "Send Request", user_requests_path(user_id: @user.id), method: :post , class: 'btn btn-info' %>
+<% end %>
+

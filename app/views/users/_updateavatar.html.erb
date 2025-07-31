@@ -1,0 +1,15 @@
+<h2 class="text-center"> Update your Avatar </h2>
+<%= form_for(@user, as: @user, url: registration_path(@user), html: { method: :patch }, :remote=>true) do |form| %>
+
+  <div class="field form-group updateavatar-form">
+    <%= form.file_field :avatar, autofocus: true, required: true, accept:'image/*', class:"form-control updateavatar-form-input" %>
+  </div>
+
+<div class="d-grid gap-3 col-2 mx-auto updateavatar-buttons">
+    <%= form.submit "Update", :onclick =>"alert('After Update Go to Profile')", 'data-disable-with' => "Wait Updating..." ,class:"btn btn-secondary" %>
+    <%= link_to "Go to Profile" ,  posts_path, method: :get, class: "btn btn-dark" %>
+</div>
+
+<% end %>
+
+

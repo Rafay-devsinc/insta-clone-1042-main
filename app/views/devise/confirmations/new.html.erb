@@ -1,0 +1,37 @@
+<div class="container ">
+    <section class="vh-100 gradient-custom">
+      <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card bg-dark text-white" style="border-radius: 1rem;">
+              <div class="card-body p-5 text-center">
+
+                <div class="mb-md-5 mt-md-4 pb-5">
+
+                  <h4 class="fw-bold mb-2 text-uppercase">Resend confirmation instructions</h4>
+                  <p class="text-white-50 mb-5">Please enter following details</p>
+
+                  <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>
+                    <%= render "shared/devisemessage", resource: resource %>
+                    <div class="form-outline form-white mb-4">
+                      <% f.label :email, class: "form-label" %>
+                      <%= f.email_field :email, class:"form-control",placeholder:"Email", required: true,  autofocus: true, autocomplete: "email", class: "form-control form-control-lg" %>
+                    </div>
+
+                    <div class="actions">
+                        <%= f.submit "Resend confirmation instructions" ,  class: "btn btn-outline-light btn-sm" %>
+                    </div>
+                  <% end %>
+                  <div class="mx-auto">
+                    <br /> <br />
+                    <%= render "devise/shared/links" %>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+</div>
+
