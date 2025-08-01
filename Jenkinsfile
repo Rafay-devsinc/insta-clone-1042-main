@@ -5,7 +5,7 @@ pipeline {
         DOCKER_REPO = credentials('docker-hub-creds')
       
         // RENDER_HOOK = credentials('render-hook')
-        IMAGE_NAME = 'rafaydevsinc/insta-clone' // Change if needed
+        IMAGE_NAME = 'rafaydevsinc/insta-clone1'
     }
 
     stages {
