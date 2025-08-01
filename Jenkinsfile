@@ -11,7 +11,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
+                git branch: 'main', url: 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
+
             }
         }
 
