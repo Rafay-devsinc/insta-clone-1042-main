@@ -34,7 +34,7 @@ pipeline {
             }
         }
 
-        // Optional: Deploy to Render
+        
         // stage('Trigger Render Deploy') {
         //     steps {
         //         sh "curl -X POST $RENDER_HOOK"
