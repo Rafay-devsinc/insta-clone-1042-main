@@ -86,16 +86,16 @@ pipeline {
         stage('Deploy Latest Container') {
             steps {
                 script {
-                    // Stop old container if running
+                    
                     sh """
                         docker stop $CONTAINER_NAME || true
                         docker rm $CONTAINER_NAME || true
                     """
 
-                    // Pull latest image
+                   
                     sh "docker pull $IMAGE_NAME:latest"
 
-                    // Run new container
+                    
                     sh """
                         docker run -d --name $CONTAINER_NAME -p 3000:3000 $IMAGE_NAME:latest
                     """
