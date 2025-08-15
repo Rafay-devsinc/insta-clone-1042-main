@@ -85,7 +85,7 @@ pipeline {
 
         stage('Deploy Latest Container') {
             steps {
-                script {
+                // script {
                     
                     sh """
                         docker stop $CONTAINER_NAME || true
@@ -99,7 +99,7 @@ pipeline {
                     sh """
                         docker run -d --name $CONTAINER_NAME -p 3000:3000 $IMAGE_NAME:latest
                     """
-                }
+                // }
             }
         }
     }
