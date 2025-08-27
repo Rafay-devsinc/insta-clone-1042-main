@@ -157,9 +157,9 @@ pipeline {
             steps {
                 sh """
                     if docker pull $IMAGE_TAG; then
-                        docker compose -f docker-compose.prod.yml down
+                        docker-compose -f docker-compose.prod.yml down
                     fi
-                    docker compose -f docker-compose.prod.yml up -d
+                    docker-compose -f docker-compose.prod.yml up -d
                 """
             }
         }
