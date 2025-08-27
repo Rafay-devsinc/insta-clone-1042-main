@@ -106,13 +106,13 @@
 // }
 
 
-
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = 'rafaydevsinc/insta-clone1'
         CONTAINER_NAME = 'insta-clone-app'
+        // IMAGE_TAG will be set after Docker Build stage
     }
 
     stages {
@@ -126,15 +126,12 @@ pipeline {
             steps {
                 script {
                     // Use commit hash as tag
-                    def COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-                    def IMAGE_TAG = "${IMAGE_NAME}:${COMMIT_HASH}"
+                    env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_HASH}"
 
                     // Build & tag
-                    sh "docker build -t ${IMAGE_NAME} ."
-                    sh "docker tag ${IMAGE_NAME} ${IMAGE_TAG}"
-
-                    // Save tag for later stages
-                    env.IMAGE_TAG = IMAGE_TAG
+                    sh "docker build -t ${env.IMAGE_NAME} ."
+                    sh "docker tag ${env.IMAGE_NAME} ${env.IMAGE_TAG}"
                 }
             }
         }
@@ -156,7 +153,10 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 sh """
-                    if docker pull $IMAGE_TAG; then
+                    export DOCKER_REPO=${env.IMAGE_NAME}
+                    export IMAGE_TAG=${env.COMMIT_HASH}
+
+                    if docker pull $DOCKER_REPO:$IMAGE_TAG; then
                         docker-compose -f docker-compose.prod.yml down
                     fi
                     docker-compose -f docker-compose.prod.yml up -d
