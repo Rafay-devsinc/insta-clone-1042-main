@@ -191,6 +191,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: Checkout_and_login
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_REPO }} .
 
@@ -208,6 +211,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: Push
     steps:
+    
+      - name: Checkout code
+        uses: actions/checkout@v3
+    
       - name: Deploy with Docker Compose
         env:
           DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
