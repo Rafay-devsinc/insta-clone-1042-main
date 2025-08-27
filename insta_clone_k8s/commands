@@ -1,0 +1,36 @@
+kubectl create secret docker-registry dockerhub-secret \
+  --docker-username="rafaydevsinc" \
+  --docker-password="dckr_pat_P0Xi2VjVecMZzEXW6VM1Z5V6yA0" \
+  --docker-email="your-email@example.com"
+
+
+
+kubectl create secret generic cloudinary-secret \
+  --from-literal=CLOUDINARY_CLOUD_NAME="dhc4xsqaj" \
+  --from-literal=CLOUDINARY_API_KEY="187544684241511" \
+  --from-literal=CLOUDINARY_API_SECRET="U-4Q53Y8W26xC2cgoai2g55UnIQ"
+
+
+
+kubectl create secret generic db-secret \
+  --from-literal=DB_USERNAME="postgres" \
+  --from-literal=DB_PASSWORD="postgres" \
+  --from-literal=DATABASE_URL="postgres://postgres:postgres@postgres:5432/mydb"
+
+
+kubectl create configmap db-config \
+  --from-literal=DB_HOST="postgres" \
+  --from-literal=RAILS_MAX_THREADS="5"
+
+
+
+kubectl apply -f postgres-pvc.yaml
+kubectl apply -f secret.yaml
+kubectl apply -f configmap.yaml
+kubectl apply -f postgres.yaml
+kubectl apply -f web.yaml
+kubectl apply -f ingress.yaml
+
+
+
+  

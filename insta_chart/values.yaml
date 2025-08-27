@@ -1,0 +1,24 @@
+postgres:
+  image: postgres:15
+  storage: 10Gi
+  username: "postgres"
+  password: "password"
+  database: "insta_clone_development"
+
+web:
+  image: rafaydevsinc/insta-clone1
+  replicas: 1
+
+cloudinary:
+  cloudName: "dhc4xsqaj"
+  apiKey: "187544684241511"
+  apiSecret: "U-4Q53Y8W26xC2cgoai2g55UnIQ"
+
+dockerhub:
+  username: "rafaydevsinc"
+  password: "dckr_pat_P0Xi2VjVecMZzEXW6VM1Z5V6yA0"
+  email: "your-email@example.com"
+
+ingress:
+  host: insta-clone-helm.local
+
