@@ -105,7 +105,6 @@
 //     }
 // }
 
-
 pipeline {
     agent any
 
@@ -158,13 +157,15 @@ pipeline {
                         set -e
 
                         # Pull the latest image with commit hash
-                        docker pull \$IMAGE_TAG || true
+                        docker pull ${env.IMAGE_TAG} || true
 
                         # Bring down existing containers if any
-                        docker-compose -f docker-compose.prod.yml down
+                        DOCKER_REPO=${env.IMAGE_NAME} IMAGE_TAG=${env.COMMIT_HASH} \\
+                          docker-compose -f docker-compose.prod.yml down
 
                         # Deploy new container(s)
-                        docker-compose -f docker-compose.prod.yml up -d
+                        DOCKER_REPO=${env.IMAGE_NAME} IMAGE_TAG=${env.COMMIT_HASH} \\
+                          docker-compose -f docker-compose.prod.yml up -d
                     """
                 }
             }
