@@ -200,16 +200,12 @@ jobs:
       - name: Tag Docker image with commit hash
         run: docker tag ${{ secrets.DOCKER_REPO }} ${{ secrets.DOCKER_REPO }}:${{ github.sha }}
 
-  Push:
-    runs-on: ubuntu-latest
-    needs: Build
-    steps:
       - name: Push Docker image (commit hash)
         run: docker push ${{ secrets.DOCKER_REPO }}:${{ github.sha }}
 
   Deploy:
     runs-on: ubuntu-latest
-    needs: Push
+    needs: Build
     steps:
     
       - name: Checkout code
