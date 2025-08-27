@@ -112,10 +112,11 @@ pipeline {
     environment {
         IMAGE_NAME = 'rafaydevsinc/insta-clone1'
         CONTAINER_NAME = 'insta-clone-app'
-        // IMAGE_TAG will be set after Docker Build stage
+        // IMAGE_TAG will be set dynamically per commit
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
@@ -125,11 +126,11 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    // Use commit hash as tag
+                    // Get short commit hash
                     env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
                     env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_HASH}"
 
-                    // Build & tag
+                    // Build Docker image
                     sh "docker build -t ${env.IMAGE_NAME} ."
                     sh "docker tag ${env.IMAGE_NAME} ${env.IMAGE_TAG}"
                 }
@@ -152,15 +153,20 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh """
-                    export DOCKER_REPO=${env.IMAGE_NAME}
-                    export IMAGE_TAG=${env.COMMIT_HASH}
+                script {
+                    sh """
+                        set -e
 
-                    if docker pull $DOCKER_REPO:$IMAGE_TAG; then
+                        # Pull the latest image with commit hash
+                        docker pull \$IMAGE_TAG || true
+
+                        # Bring down existing containers if any
                         docker-compose -f docker-compose.prod.yml down
-                    fi
-                    docker-compose -f docker-compose.prod.yml up -d
-                """
+
+                        # Deploy new container(s)
+                        docker-compose -f docker-compose.prod.yml up -d
+                    """
+                }
             }
         }
     }
