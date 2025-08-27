@@ -177,8 +177,6 @@ on:
 jobs:
   Checkout_and_login:
     runs-on: ubuntu-latest
-    outputs:
-      docker_repo: ${{ secrets.DOCKER_REPO }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -193,14 +191,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: Checkout_and_login
     steps:
-      - name: Build Docker image with commit hash tag
-        run: docker build -t ${{ secrets.DOCKER_REPO }}:${{ github.sha }} .
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_REPO }} .
+
+      - name: Tag Docker image with commit hash
+        run: docker tag ${{ secrets.DOCKER_REPO }} ${{ secrets.DOCKER_REPO }}:${{ github.sha }}
 
   Push:
     runs-on: ubuntu-latest
     needs: Build
     steps:
-      - name: Push Docker image to Docker Hub
+      - name: Push Docker image (commit hash)
         run: docker push ${{ secrets.DOCKER_REPO }}:${{ github.sha }}
 
   Deploy:
@@ -215,4 +216,5 @@ jobs:
           docker compose -f docker-compose.prod.yml down
           docker compose -f docker-compose.prod.yml pull
           docker compose -f docker-compose.prod.yml up -d
+
 
