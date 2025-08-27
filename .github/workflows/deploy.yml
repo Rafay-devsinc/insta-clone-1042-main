@@ -223,8 +223,9 @@ jobs:
           DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker compose -f docker-compose.prod.yml down
-          docker compose -f docker-compose.prod.yml pull
-          docker compose -f docker-compose.prod.yml up -d
+          if docker pull $DOCKER_REPO:$IMAGE_TAG; then
+             docker compose -f docker-compose.prod.yml down
+          fi
+             docker compose -f docker-compose.prod.yml up -d
 
 
