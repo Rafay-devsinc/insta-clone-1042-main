@@ -160,11 +160,7 @@ pipeline {
                         export DOCKER_REPO=${env.IMAGE_NAME}
                         export IMAGE_TAG=${env.COMMIT_HASH}
 
-                        # Pull latest image (optional, ensures image exists)
-                        docker pull \${DOCKER_REPO}:\${IMAGE_TAG} || true
-
-                        # Bring down existing containers safely
-                        docker-compose -f docker-compose.prod.yml down || true
+                        
 
                         # Deploy new containers
                         docker-compose -f docker-compose.prod.yml up -d
