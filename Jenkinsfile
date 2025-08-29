@@ -153,14 +153,17 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    sh """
-                    
+            sh """
+                set -e
 
-                        # Deploy new container(s)
-                        DOCKER_REPO=${env.IMAGE_NAME} IMAGE_TAG=${env.COMMIT_HASH} \\
-                          docker-compose -f docker-compose.prod.yml up -d
-                    """
-                }
+                # Export variables so docker-compose can see them
+                export DOCKER_REPO=${env.IMAGE_NAME}
+                export IMAGE_TAG=${env.COMMIT_HASH}
+
+                # Deploy new container(s)
+                docker-compose -f docker-compose.prod.yml up -d
+            """
+        }
             }
         }
     }
