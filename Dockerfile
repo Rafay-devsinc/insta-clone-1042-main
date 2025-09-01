@@ -29,8 +29,8 @@
 
 
 
-# FROM ruby:2.7.3
-FROM ruby:2.7-bullseye
+FROM ruby:2.7.3
+
 WORKDIR /app
 
 
