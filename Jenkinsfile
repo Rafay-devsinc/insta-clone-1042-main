@@ -105,153 +105,76 @@
 //     }
 // }
 
-// pipeline {
-//     agent any
-
-//     environment {
-//         IMAGE_NAME = 'rafaydevsinc/insta-clone1'
-//         CONTAINER_NAME = 'insta-clone-app'
-//         // IMAGE_TAG will be set dynamically per commit
-//     }
-
-//     stages {
-
-//         stage('Checkout') {
-//             steps {
-//                 git branch: 'main', url: 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
-//             }
-//         }
-
-      
-       
-    
-//         stage('Docker Build') {
-//             steps {
-//                 script {
-
-                       
-                      
-//                     // Get short commit hash
-//                     env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-//                     env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_HASH}"
-
-//                     // Build Docker image
-//                     sh "docker build -t ${env.IMAGE_NAME} ."
-//                     sh "docker tag ${env.IMAGE_NAME} ${env.IMAGE_TAG}"
-//                 }
-//             }
-//         }
-
-//         stage('Docker Login') {
-//             steps {
-//                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-//                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-//                 }
-//             }
-//         }
-
-//         stage('Push Docker Image') {
-//             steps {
-//                 sh 'docker push $IMAGE_TAG'
-//             }
-//         }
-
-//         stage('Deploy with Docker Compose') {
-//             steps {
-//                 script {
-//                     sh """
-//                         set -e
-
-//                         # Export variables for docker-compose
-//                         export DOCKER_REPO=${env.IMAGE_NAME}
-//                         export IMAGE_TAG=${env.COMMIT_HASH}
-
-                        
-
-//                         # Deploy new containers
-//                          docker-compose -f docker-compose.prod.yml up -d --pull always
-//                     """
-//                 }
-//             }
-//         }
-
-//     }
-// }
-
-
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = 'rafaydevsinc/insta-clone1'
         CONTAINER_NAME = 'insta-clone-app'
-        DOCKER_USER = credentials('docker-hub-username') // Jenkins credentials ID
-        DOCKER_PASS = credentials('docker-hub-password')
+        // IMAGE_TAG will be set dynamically per commit
     }
 
     stages {
-        stage('Checkout SCM') {
+
+        stage('Checkout') {
             steps {
-                checkout scm
-                script {
-                    env.COMMIT_SHA = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    echo "Commit SHA: ${env.COMMIT_SHA}"
-                }
+                git branch: 'main', url: 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
             }
         }
 
+      
+       
+    
         stage('Docker Build') {
             steps {
                 script {
-                    sh "docker build -t ${IMAGE_NAME} ."
-                    sh "docker tag ${IMAGE_NAME} ${IMAGE_NAME}:${env.COMMIT_SHA}"
+
+                       
+                      
+                    // Get short commit hash
+                    env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_HASH}"
+
+                    // Build Docker image
+                    sh "docker build -t ${env.IMAGE_NAME} ."
+                    sh "docker tag ${env.IMAGE_NAME} ${env.IMAGE_TAG}"
                 }
             }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh "echo $PASS | docker login -u $USER --password-stdin"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push ${IMAGE_NAME}:${env.COMMIT_SHA}"
+                sh 'docker push $IMAGE_TAG'
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh """
-                export DOCKER_REPO=${IMAGE_NAME}
-                export IMAGE_TAG=${env.COMMIT_SHA}
-                docker-compose -f docker-compose.prod.yml up -d --pull always
-                """
+                script {
+                    sh """
+                        set -e
+
+                        # Export variables for docker-compose
+                        export DOCKER_REPO=${env.IMAGE_NAME}
+                        export IMAGE_TAG=${env.COMMIT_HASH}
+
+                        
+
+                        # Deploy new containers
+                         docker-compose -f docker-compose.prod.yml up -d --pull always
+                    """
+                }
             }
         }
-    }
 
-    post {
-        success {
-            githubNotify(
-                context: 'ci/jenkins-pipeline',
-                description: 'Build succeeded',
-                status: 'SUCCESS'
-            )
-        }
-        failure {
-            githubNotify(
-                context: 'ci/jenkins-pipeline',
-                description: 'Build failed',
-                status: 'FAILURE'
-            )
-        }
-        always {
-            echo "Pipeline finished for commit: ${env.COMMIT_SHA}"
-        }
     }
 }
 
