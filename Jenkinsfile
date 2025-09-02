@@ -122,6 +122,16 @@ pipeline {
             }
         }
 
+    stages {
+        stage('Check GitHub PAT') {
+            steps {
+                withCredentials([string(credentialsId: 'github-patcred2', variable: 'GH_PAT')]) {
+                    sh 'echo "Token length: ${#GH_PAT}"'
+                }
+            }
+        }
+    }  
+
         stage('Docker Build') {
             steps {
                 script {
