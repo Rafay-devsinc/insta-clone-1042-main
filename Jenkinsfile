@@ -125,6 +125,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
+
+                    githubNotify context: 'Build', status: 'PENDING'
                     // Get short commit hash
                     env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
                     env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_HASH}"
