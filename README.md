@@ -1,4 +1,4 @@
-# README1
+# README
 
 # Insta-Clone-1042
 
