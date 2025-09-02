@@ -105,37 +105,107 @@
 //     }
 // }
 
+// pipeline {
+//     agent any
+
+//     environment {
+//         IMAGE_NAME = 'rafaydevsinc/insta-clone1'
+//         CONTAINER_NAME = 'insta-clone-app'
+//         // IMAGE_TAG will be set dynamically per commit
+//     }
+
+//     stages {
+
+//         stage('Checkout') {
+//             steps {
+//                 git branch: 'main', url: 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
+//             }
+//         }
+
+      
+       
+    
+//         stage('Docker Build') {
+//             steps {
+//                 script {
+
+                       
+                      
+//                     // Get short commit hash
+//                     env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+//                     env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_HASH}"
+
+//                     // Build Docker image
+//                     sh "docker build -t ${env.IMAGE_NAME} ."
+//                     sh "docker tag ${env.IMAGE_NAME} ${env.IMAGE_TAG}"
+//                 }
+//             }
+//         }
+
+//         stage('Docker Login') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+//                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+//                 }
+//             }
+//         }
+
+//         stage('Push Docker Image') {
+//             steps {
+//                 sh 'docker push $IMAGE_TAG'
+//             }
+//         }
+
+//         stage('Deploy with Docker Compose') {
+//             steps {
+//                 script {
+//                     sh """
+//                         set -e
+
+//                         # Export variables for docker-compose
+//                         export DOCKER_REPO=${env.IMAGE_NAME}
+//                         export IMAGE_TAG=${env.COMMIT_HASH}
+
+                        
+
+//                         # Deploy new containers
+//                          docker-compose -f docker-compose.prod.yml up -d --pull always
+//                     """
+//                 }
+//             }
+//         }
+
+//     }
+// }
+
+
+
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = 'rafaydevsinc/insta-clone1'
         CONTAINER_NAME = 'insta-clone-app'
-        // IMAGE_TAG will be set dynamically per commit
     }
 
     stages {
-
         stage('Checkout') {
             steps {
+                // Checkout code from GitHub
                 git branch: 'main', url: 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
+                
+                // Get commit SHA dynamically (works for PRs and pushes)
+                script {
+                    env.COMMIT_SHA = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_SHA}"
+                    echo "Commit SHA: ${env.COMMIT_SHA}"
+                }
             }
         }
 
-      
-       
-    
         stage('Docker Build') {
             steps {
                 script {
-
-                       
-                      
-                    // Get short commit hash
-                    env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-                    env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_HASH}"
-
-                    // Build Docker image
                     sh "docker build -t ${env.IMAGE_NAME} ."
                     sh "docker tag ${env.IMAGE_NAME} ${env.IMAGE_TAG}"
                 }
@@ -161,23 +231,57 @@ pipeline {
                 script {
                     sh """
                         set -e
-
-                        # Export variables for docker-compose
                         export DOCKER_REPO=${env.IMAGE_NAME}
-                        export IMAGE_TAG=${env.COMMIT_HASH}
-
-                        
-
-                        # Deploy new containers
-                         docker-compose -f docker-compose.prod.yml up -d --pull always
+                        export IMAGE_TAG=${env.COMMIT_SHA}
+                        docker-compose -f docker-compose.prod.yml up -d --pull always
                     """
                 }
             }
         }
+    }
 
+    post {
+        success {
+            script {
+                echo "Sending SUCCESS status to GitHub"
+                def response = httpRequest(
+                    url: "https://api.github.com/repos/Rafay-devsinc/insta-clone-1042-main/statuses/${env.COMMIT_SHA}",
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: """{
+                        "state": "success",
+                        "description": "Build and deployment succeeded",
+                        "context": "ci/jenkins-pipeline",
+                        "target_url": "${env.BUILD_URL}"
+                    }""",
+                    authentication: 'github-patcred2'
+                )
+                echo "GitHub Response: ${response.status}"
+            }
+        }
+
+        failure {
+            script {
+                echo "Sending FAILURE status to GitHub"
+                def response = httpRequest(
+                    url: "https://api.github.com/repos/Rafay-devsinc/insta-clone-1042-main/statuses/${env.COMMIT_SHA}",
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: """{
+                        "state": "failure",
+                        "description": "Build or deployment failed",
+                        "context": "ci/jenkins-pipeline",
+                        "target_url": "${env.BUILD_URL}"
+                    }""",
+                    authentication: 'github-patcred2'
+                )
+                echo "GitHub Response: ${response.status}"
+            }
+        }
+
+        always {
+            echo "Pipeline finished for commit: ${env.COMMIT_SHA}"
+        }
     }
 }
-
-
-
 
