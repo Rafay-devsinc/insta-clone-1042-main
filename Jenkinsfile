@@ -122,7 +122,22 @@ pipeline {
             }
         }
 
-   
+      
+        stage('Build') {
+            steps {
+                githubNotify context: 'Build', status: 'PENDING'
+                script {
+                    try {
+                        sh 'make build'
+                        githubNotify context: 'Build', status: 'SUCCESS'
+                    } catch (e) {
+                        githubNotify context: 'Build', status: 'FAILURE'
+                        throw e
+                    }
+                }
+            }
+        }
+    
         stage('Docker Build') {
             steps {
                 script {
