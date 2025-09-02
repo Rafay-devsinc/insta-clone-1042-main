@@ -175,48 +175,6 @@ pipeline {
             }
         }
 
-
-
-          post {
-    success {
-        script {
-            echo "Sending 'success' status to GitHub PR or commit"
-            def response = httpRequest(
-                url: "https://api.github.com/repos/Rafay-devsinc/insta-clone-1042-main/statuses/${params.commit_sha}",
-                httpMode: 'POST',
-                contentType: 'APPLICATION_JSON',
-                requestBody: """{
-                    "state": "success",
-                    "description": "Build and deployment succeeded",
-                    "context": "ci/jenkins-pipeline",
-                    "target_url": "${env.BUILD_URL}"
-                }""",
-                authentication: 'github-patcred2' // Using your credential
-            )
-            echo "GitHub Response: ${response.status}"
-        }
-    }
-
-    failure {
-        script {
-            echo "Sending 'failure' status to GitHub PR or commit"
-            def response = httpRequest(
-                url: "https://api.github.com/repos/Rafay-devsinc/insta-clone-1042-main/statuses/${params.commit_sha}",
-                httpMode: 'POST',
-                contentType: 'APPLICATION_JSON',
-                requestBody: """{
-                    "state": "failure",
-                    "description": "Build or deployment failed",
-                    "context": "ci/jenkins-pipeline",
-                    "target_url": "${env.BUILD_URL}"
-                }""",
-                authentication: 'github-patcred2' // Using your credential
-            )
-            echo "GitHub Response: ${response.status}"
-        }
-    }
-}
-
     }
 }
 
