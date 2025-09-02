@@ -254,7 +254,7 @@ pipeline {
                         "context": "ci/jenkins-pipeline",
                         "target_url": "${env.BUILD_URL}"
                     }""",
-                    authentication: 'github-patcred2'
+                    authentication: 'github-cred'
                 )
                 echo "GitHub Response: ${response.status}"
             }
@@ -273,7 +273,7 @@ pipeline {
                         "context": "ci/jenkins-pipeline",
                         "target_url": "${env.BUILD_URL}"
                     }""",
-                    authentication: 'github-patcred2'
+                    authentication: 'github-cred'
                 )
                 echo "GitHub Response: ${response.status}"
             }
