@@ -126,11 +126,14 @@ pipeline {
             steps {
                 script {
 
-                    githubNotify credentialsId: 'github-token',
-                             repo: 'rafay-devsinc/insta-clone1',
-                             sha: "${env.GIT_COMMIT}",
-                             context: 'Build',
-                             status: 'PENDING'
+                         def commitSha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+
+                         githubNotify credentialsId: 'github-token',
+                         repo: 'Rafay-devsinc/insta-clone-1042-main',
+                         account: 'Rafay-devsinc',
+                         sha: commitSha,
+                         context: 'Build',
+                         status: 'PENDING'
                       
                     // Get short commit hash
                     env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
