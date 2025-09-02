@@ -122,28 +122,12 @@ pipeline {
             }
         }
 
-    stages {
-        stage('Check GitHub PAT') {
-            steps {
-                withCredentials([string(credentialsId: 'github-patcred2', variable: 'GH_PAT')]) {
-                    sh 'echo "Token length: ${#GH_PAT}"'
-                }
-            }
-        }
-    }  
-
+   
         stage('Docker Build') {
             steps {
                 script {
 
-                         def commitSha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-
-                         githubNotify credentialsId: 'github-patcred2',
-                         repo: 'Rafay-devsinc/insta-clone-1042-main',
-                         account: 'Rafay-devsinc',
-                         sha: commitSha,
-                         context: 'Build',
-                         status: 'PENDING'
+                       
                       
                     // Get short commit hash
                     env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
