@@ -49,5 +49,5 @@ A Instagram Cone which works mostly like an actual instagram social application.
 
 
 Jenkins Status:
+[![Build Status](https://170b3039aabb.ngrok-free.app/job/Insta-clone-pipeline/badge/icon)](https://170b3039aabb.ngrok-free.app/job/Insta-clone-pipeline/)
 
-[![Build Status](http://localhost:8080/job/Insta-clone-pipeline/badge/icon)](http://localhost:8080/job/Insta-clone-pipeline/)
