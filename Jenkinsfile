@@ -179,25 +179,22 @@
 // }
 
 
-
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = 'rafaydevsinc/insta-clone1'
         CONTAINER_NAME = 'insta-clone-app'
+        DOCKER_USER = credentials('docker-hub-username') // Jenkins credentials ID
+        DOCKER_PASS = credentials('docker-hub-password')
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                // Checkout code from GitHub
-                git branch: 'main', url: 'https://github.com/Rafay-devsinc/insta-clone-1042-main.git'
-                
-                // Get commit SHA dynamically (works for PRs and pushes)
+                checkout scm
                 script {
-                    env.COMMIT_SHA = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-                    env.IMAGE_TAG = "${env.IMAGE_NAME}:${env.COMMIT_SHA}"
+                    env.COMMIT_SHA = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                     echo "Commit SHA: ${env.COMMIT_SHA}"
                 }
             }
@@ -206,82 +203,56 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    sh "docker build -t ${env.IMAGE_NAME} ."
-                    sh "docker tag ${env.IMAGE_NAME} ${env.IMAGE_TAG}"
+                    sh "docker build -t ${IMAGE_NAME} ."
+                    sh "docker tag ${IMAGE_NAME} ${IMAGE_NAME}:${env.COMMIT_SHA}"
                 }
             }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh "echo $PASS | docker login -u $USER --password-stdin"
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker push $IMAGE_TAG'
+                sh "docker push ${IMAGE_NAME}:${env.COMMIT_SHA}"
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                script {
-                    sh """
-                        set -e
-                        export DOCKER_REPO=${env.IMAGE_NAME}
-                        export IMAGE_TAG=${env.COMMIT_SHA}
-                        docker-compose -f docker-compose.prod.yml up -d --pull always
-                    """
-                }
+                sh """
+                export DOCKER_REPO=${IMAGE_NAME}
+                export IMAGE_TAG=${env.COMMIT_SHA}
+                docker-compose -f docker-compose.prod.yml up -d --pull always
+                """
             }
         }
     }
 
     post {
         success {
-            script {
-                echo "Sending SUCCESS status to GitHub"
-                def response = httpRequest(
-                    url: "https://api.github.com/repos/Rafay-devsinc/insta-clone-1042-main/statuses/${env.COMMIT_SHA}",
-                    httpMode: 'POST',
-                    contentType: 'APPLICATION_JSON',
-                    requestBody: """{
-                        "state": "success",
-                        "description": "Build and deployment succeeded",
-                        "context": "ci/jenkins-pipeline",
-                        "target_url": "${env.BUILD_URL}"
-                    }""",
-                    authentication: 'github-cred'
-                )
-                echo "GitHub Response: ${response.status}"
-            }
+            githubNotify(
+                context: 'ci/jenkins-pipeline',
+                description: 'Build succeeded',
+                status: 'SUCCESS'
+            )
         }
-
         failure {
-            script {
-                echo "Sending FAILURE status to GitHub"
-                def response = httpRequest(
-                    url: "https://api.github.com/repos/Rafay-devsinc/insta-clone-1042-main/statuses/${env.COMMIT_SHA}",
-                    httpMode: 'POST',
-                    contentType: 'APPLICATION_JSON',
-                    requestBody: """{
-                        "state": "failure",
-                        "description": "Build or deployment failed",
-                        "context": "ci/jenkins-pipeline",
-                        "target_url": "${env.BUILD_URL}"
-                    }""",
-                    authentication: 'github-cred'
-                )
-                echo "GitHub Response: ${response.status}"
-            }
+            githubNotify(
+                context: 'ci/jenkins-pipeline',
+                description: 'Build failed',
+                status: 'FAILURE'
+            )
         }
-
         always {
             echo "Pipeline finished for commit: ${env.COMMIT_SHA}"
         }
     }
 }
+
 
