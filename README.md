@@ -46,3 +46,8 @@ A Instagram Cone which works mostly like an actual instagram social application.
 
 - This project is deployed on Heroku with main branch.
 - Main and testcases are the final 2 branches of the code.
+
+
+Jenkins Status:
+
+[![Build Status](http://localhost:8080/job/Insta-clone-pipeline/badge/icon)](http://localhost:8080/job/Insta-clone-pipeline/)
