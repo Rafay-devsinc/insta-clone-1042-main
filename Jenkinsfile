@@ -128,7 +128,7 @@ pipeline {
 
                          def commitSha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
-                         githubNotify credentialsId: 'github-token',
+                         githubNotify credentialsId: 'github-patcred2',
                          repo: 'Rafay-devsinc/insta-clone-1042-main',
                          account: 'Rafay-devsinc',
                          sha: commitSha,
