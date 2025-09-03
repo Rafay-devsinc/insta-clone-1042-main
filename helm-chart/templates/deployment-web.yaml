@@ -18,7 +18,7 @@ spec:
       - name: web
         image: {{ .Values.web.image }}
         ports:
-        - containerPort: 3000
+        - containerPort: {{ .Values.web.port }}
         envFrom:
         - configMapRef:
             name: db-config

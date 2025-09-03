@@ -48,6 +48,9 @@ A Instagram Cone which works mostly like an actual instagram social application.
 - Main and testcases are the final 2 branches of the code.
 
 
+For Running the K8s : Follow the commands folder in k8s folder and run those in terminal.
+
+
 Jenkins Status:
 [![Build Status](https://170b3039aabb.ngrok-free.app/job/Insta-clone-pipeline/badge/icon)](https://170b3039aabb.ngrok-free.app/job/Insta-clone-pipeline/)
 

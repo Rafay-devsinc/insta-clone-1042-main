@@ -27,8 +27,10 @@ kubectl create configmap db-config \
 kubectl apply -f postgres-pvc.yaml
 kubectl apply -f secret.yaml
 kubectl apply -f configmap.yaml
-kubectl apply -f postgres.yaml
-kubectl apply -f web.yaml
+kubectl apply -f postgres-deployment.yaml
+kubectl apply -f postgres-service.yaml
+kubectl apply -f web-deployment.yaml
+kubectl apply -f web-service.yaml
 kubectl apply -f ingress.yaml
 
 
