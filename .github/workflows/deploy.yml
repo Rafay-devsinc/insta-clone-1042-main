@@ -5,6 +5,7 @@
 # on:
 #   push:
 #     branches: [main]
+    
 
 # jobs:
 #   Build_AND_Push:
@@ -173,6 +174,8 @@ name: CI/CD Deploy Docker
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [ main ]  
 
 jobs:
   Checkout_and_login:
