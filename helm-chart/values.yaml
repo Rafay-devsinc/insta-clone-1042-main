@@ -24,7 +24,7 @@ dockerhub:
   email: "your-email@example.com"
 
 ingress:
-  host: insta-clone-helm.local
+  host: insta-clone-helm
 
   
 # staticsite:
@@ -42,7 +42,7 @@ services:
     replicas: 1
     port: 3000
   - name: staticsite
-    enabled: true # Set to false to skip this deployment
+    enabled: true
     image: dockersamples/static-site:latest
     replicas: 1
     port: 80
