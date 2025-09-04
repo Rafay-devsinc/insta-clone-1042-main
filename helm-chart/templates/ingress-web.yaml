@@ -1,20 +1,54 @@
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: web-ingress
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#   - host: {{ .Values.ingress.host }}
+#     http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: web
+#             port:
+#               number: 3000
+#       - path: /static
+#         pathType: Prefix
+#         backend:
+#               service:
+#                 name: staticsite # same service
+#                 port:
+#                   number: 80
+        
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: web-ingress
+  name: {{ .Release.Name }}-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ .Values.ingress.host }}
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: web
-            port:
-              number: 3000
-
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-web
+                port:
+                  number: {{ (index .Values.services 0).port }}
+          - path: /static
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-staticsite
+                port:
+                  number: {{ (index .Values.services 1).port }}

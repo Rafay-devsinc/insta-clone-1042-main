@@ -5,11 +5,13 @@ postgres:
   password: "password"
   database: "insta_clone_development"
   port: 5432
-
-web:
-  image: rafaydevsinc/insta-clone1
   replicas: 1
-  port: 3000
+
+# web:
+#   image: rafaydevsinc/insta-clone1
+#   replicas: 1
+#   port: 3000
+#   name: web
 
 cloudinary:
   cloudName: "dhc4xsqaj"
@@ -24,3 +26,23 @@ dockerhub:
 ingress:
   host: insta-clone-helm.local
 
+  
+# staticsite:
+#   enabled: true
+#   image: dockersamples/static-site:latest
+#   port: 80
+#   name: staticsite
+#   replicas: 1
+
+
+services:
+  - name: web
+    enabled: true
+    image: rafaydevsinc/insta-clone1
+    replicas: 1
+    port: 3000
+  - name: staticsite
+    enabled: true # Set to false to skip this deployment
+    image: dockersamples/static-site:latest
+    replicas: 1
+    port: 80

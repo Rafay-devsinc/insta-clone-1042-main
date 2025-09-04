@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: postgres
 spec:
-  replicas: 1
+  replicas: {{ .Values.postgres.replicas }}
   selector:
     matchLabels:
       app: postgres
@@ -15,6 +15,7 @@ spec:
       containers:
       - name: postgres
         image: {{ .Values.postgres.image }}
+        imagePullPolicy: Always
         ports:
         - containerPort: {{ .Values.postgres.port }}
         envFrom:
