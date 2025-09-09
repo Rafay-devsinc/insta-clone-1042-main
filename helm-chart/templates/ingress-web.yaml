@@ -15,7 +15,8 @@ spec:
             backend:
               service:
                 name: {{ .Release.Name }}-web
-                port:
+                port:: 80
+
                   number: {{ (index .Values.services 0).port }}
           - path: /static
             pathType: Prefix

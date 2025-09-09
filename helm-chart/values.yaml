@@ -37,7 +37,7 @@ ingress:
 
 services:
   - name: web
-    enabled: true
+    enabled: false
     image: rafaydevsinc/insta-clone1
     replicas: 1
     port: 3000
