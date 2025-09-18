@@ -169,7 +169,7 @@ pipeline {
                         
 
                         # Deploy new containers
-                         docker-compose -f docker-compose.prod.yml up -d --pull always
+                         docker compose -f docker-compose.prod.yml up -d --pull always
                     """
                 }
             }
