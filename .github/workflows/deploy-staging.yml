@@ -43,6 +43,8 @@ jobs:
       - name: Render Task Definition with New Image
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
+        env:
+           IMAGE_TAG: ${{ github.sha }}
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
