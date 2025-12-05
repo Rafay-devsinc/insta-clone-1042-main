@@ -7,47 +7,53 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-staging:
+  build-and-push:
+    name: Build and Push Docker Image
     uses: Rafay-devsinc/insta-clone-1042-main/.github/workflows/build-and-push.yml@main
     with:
       branch: main
       environment: staging-deploy
     secrets: inherit
+    outputs:
+      image-uri: ${{ steps.set_image_uri.outputs.image_uri }}
 
   ecs-deploy:
     name: ECS Staging Deployment
-    needs: deploy-staging  # ✅ Reference the previous job output
+    needs: build-and-push
     runs-on: ubuntu-latest
+    env:
+      ECS_CLUSTER: Parkguard-ECS-Staging-Cluster
+      ECS_SERVICE: parkguard-ecs-staging-webapp-TD-service-yyhah51y
+      CONTAINER_NAME: webapp-container
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: AKIAT6ZY5G7PYD7WWAMG
           aws-secret-access-key: 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
           aws-region: eu-north-1
 
-      - name: Update Task Definition with New Image
+      - name: Download Current Task Definition
         run: |
-          IMAGE_TAG=${{ needs.deploy-staging.outputs.image_tag }}
-          ECR_REGISTRY=272312907743.dkr.ecr.eu-north-1.amazonaws.com
-
-          # Fetch current task definition
           aws ecs describe-task-definition \
             --task-definition parkguard-ecs-staging-webapp-TD \
-            --query "taskDefinition" > task_definition.json
+            --query "taskDefinition" > task-definition.json
 
-          # Update image
-          jq --arg IMAGE "$ECR_REGISTRY/parkguard-ecs-staging:staging-$IMAGE_TAG" \
-             '.containerDefinitions[0].image = $IMAGE' task_definition.json > new_task_definition.json
+      - name: Render Task Definition with New Image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ needs.build-and-push.outputs.image-uri }}
 
-          # Register new revision
-          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
-            --cli-input-json file://new_task_definition.json \
-            --query "taskDefinition.taskDefinitionArn" --output text)
-
-          # Update ECS service
-          aws ecs update-service \
-            --cluster Parkguard-ECS-Staging-Cluster \
-            --service parkguard-ecs-staging-webapp-TD-service-yyhah51y \
-            --task-definition $NEW_TASK_DEF_ARN
+      - name: Deploy to ECS Service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          wait-for-service-stability: true
