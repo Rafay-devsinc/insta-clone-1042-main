@@ -14,8 +14,6 @@ jobs:
       branch: main
       environment: staging-deploy
     secrets: inherit
-    outputs:
-      image-uri: ${{ steps.set_image_uri.outputs.image_uri }}
 
   ecs-deploy:
     name: ECS Staging Deployment
@@ -48,7 +46,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ needs.build-and-push.outputs.image-uri }}
+          image: 272312907743.dkr.ecr.eu-north-1.amazonaws.com/parkguard-ecs-staging:staging-${GITHUB_SHA}
 
       - name: Deploy to ECS Service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
