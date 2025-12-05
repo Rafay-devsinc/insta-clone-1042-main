@@ -7,14 +7,41 @@ on:
   workflow_dispatch:
 
 jobs:
+  # 1️⃣ Build and Push Docker Image
   build-and-push:
     name: Build and Push Docker Image
-    uses: Rafay-devsinc/insta-clone-1042-main/.github/workflows/build-and-push.yml@main
-    with:
-      branch: main
-      environment: staging-deploy
-    secrets: inherit
+    runs-on: ubuntu-latest
+    outputs:
+      image-uri: ${{ steps.set_image_uri.outputs.image-uri }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: AKIAT6ZY5G7PYD7WWAMG
+          aws-secret-access-key: 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
+          aws-region: eu-north-1
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set Image Tag & URI
+        id: set_image_uri
+        run: |
+          IMAGE_TAG=${GITHUB_SHA}
+          IMAGE_URI=272312907743.dkr.ecr.eu-north-1.amazonaws.com/parkguard-ecs-staging:staging-$IMAGE_TAG
+          echo "image-uri=$IMAGE_URI" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker Image
+        env:
+          IMAGE_URI: ${{ steps.set_image_uri.outputs.image-uri }}
+        run: |
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+  # 2️⃣ Deploy to ECS
   ecs-deploy:
     name: ECS Staging Deployment
     needs: build-and-push
@@ -34,26 +61,24 @@ jobs:
           aws-secret-access-key: XQhuSWHOGPXKhf0LtLyUL2LPQp4VRbn1tn559Y5q
           aws-region: eu-north-1
 
-      - name: Download Current Task Definition
+      - name: Download current task definition
         run: |
           aws ecs describe-task-definition \
             --task-definition parkguard-ecs-staging-webapp-TD \
-            --query "taskDefinition" > task-definition.json
+            --query taskDefinition > task-definition.json
 
-      - name: Render Task Definition with New Image
+      - name: Render new task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
-        env:
-           IMAGE_TAG: ${{ github.sha }}
         with:
           task-definition: task-definition.json
           container-name: ${{ env.CONTAINER_NAME }}
-          image: 272312907743.dkr.ecr.eu-north-1.amazonaws.com/parkguard-ecs-staging:staging-${GITHUB_SHA}
+          image: ${{ needs.build-and-push.outputs.image-uri }}
 
-      - name: Deploy to ECS Service
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          cluster: ${{ env.ECS_CLUSTER }}
           service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
