@@ -12,38 +12,43 @@ on:
     outputs:
       image_tag:
         description: 'Git SHA to be used when pulling image in deployment workflow'
-        value: ${{ env.IMAGE_TAG }}
+        value: ${{ jobs.build-and-push.outputs.image_tag }}
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
-      image_tag: ${{ env.IMAGE_TAG }}
+      # reference step output, not env
+      image_tag: ${{ steps.set_tag.outputs.IMAGE_TAG }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: AKIAT6ZY5G7PYD7WWAMG
           aws-secret-access-key: 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
           aws-region: eu-north-1
 
-      - uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'false'
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Set IMAGE_TAG
+      - name: Set Image Tag (Use Git SHA)
+        id: set_tag
         run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+        # Also set step output
+        echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_OUTPUT
 
       - name: Build and Push Docker Image
         env:
           ECR_REGISTRY: 272312907743.dkr.ecr.eu-north-1.amazonaws.com
           ECR_REPOSITORY: parkguard-ecs-staging
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+          IMAGE_TAG: ${{ steps.set_tag.outputs.IMAGE_TAG }}
         run: |
-          if [ "${{ inputs.branch }}" == "main" ]; then
+          if [ "${{ inputs.branch }}" == "development" ]; then
             docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:staging-$IMAGE_TAG .
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:staging-$IMAGE_TAG
           fi
