@@ -172,8 +172,8 @@
 name: CI/CD Deploy Docker
 
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   pull_request:
     branches: [ main ]  
 
