@@ -1,0 +1,65 @@
+
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    uses: Rafay-devsinc/insta-clone-1042-main/.github/workflows/build-and-push.yml@main
+    with:
+      branch: main
+      environment: 'staging-deploy'
+    secrets: inherit
+    outputs:
+      image_tag: ${{ steps.get_image_tag.outputs.image_tag }}
+
+  ecs-deploy:
+    name: ECS Staging Deployment
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: AKIAT6ZY5G7PYD7WWAMG
+          aws-secret-access-key: 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
+          aws-region: eu-north-1
+
+      - name: Get current Task Definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition parkguard-ecs-staging-webapp-TD \
+            --query "taskDefinition" > task_definition.json
+
+      - name: Update Task Definition with New Image
+        run: |
+          IMAGE_TAG=${{ needs.deploy-staging.outputs.image_tag }}
+          ECR_REGISTRY=272312907743.dkr.ecr.eu-north-1.amazonaws.com
+          jq --arg IMAGE "$ECR_REGISTRY/parkguard-ecs-staging:staging-$IMAGE_TAG" \
+             '.containerDefinitions[0].image = $IMAGE' task_definition.json > new_task_definition.json
+
+      - name: Register New Task Definition
+        id: register-task
+        run: |
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new_task_definition.json \
+            --query "taskDefinition.taskDefinitionArn" --output text)
+          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
+
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service \
+            --cluster Parkguard-ECS-Staging-Cluster \
+            --service parkguard-ecs-staging-webapp-TD-service-yyhah51y \
+            --task-definition ${{ env.NEW_TASK_DEF_ARN }}
+
+
+
