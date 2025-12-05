@@ -43,7 +43,7 @@ jobs:
           ECR_REPOSITORY: parkguard-ecs-staging
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          if [ "${{ inputs.branch }}" == "development" ]; then
+          if [ "${{ inputs.branch }}" == "main" ]; then
             docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:staging-$IMAGE_TAG .
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:staging-$IMAGE_TAG
           fi
