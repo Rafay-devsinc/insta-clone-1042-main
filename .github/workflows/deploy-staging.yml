@@ -20,8 +20,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: AKIAT6ZY5G7PYD7WWAMG
-          aws-secret-access-key: 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
+          aws-access-key-id: 
+          aws-secret-access-key: 
           aws-region: eu-north-1
 
       - name: Log in to Amazon ECR
@@ -31,7 +31,7 @@ jobs:
         id: set_image_uri
         run: |
           IMAGE_TAG=${GITHUB_SHA}
-          IMAGE_URI=272312907743.dkr.ecr.eu-north-1.amazonaws.com/parkguard-ecs-staging:staging-$IMAGE_TAG
+          IMAGE_URI=
           echo "image-uri=$IMAGE_URI" >> $GITHUB_OUTPUT
 
       - name: Build and Push Docker Image
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ECS_CLUSTER: Parkguard-ECS-Staging-Cluster
-      ECS_SERVICE: parkguard-ecs-staging-webapp-TD-service-yyhah51y
+      ECS_SERVICE: 
       CONTAINER_NAME: webapp-container
     steps:
       - name: Checkout Repository
@@ -57,8 +57,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: AKIAT6ZY5G7PYD7WWAMG
-          aws-secret-access-key: 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
+          aws-access-key-id: 
+          aws-secret-access-key: 
           aws-region: eu-north-1
 
       - name: Download current task definition
