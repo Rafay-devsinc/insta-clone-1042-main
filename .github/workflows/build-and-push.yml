@@ -30,8 +30,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: AKIAT6ZY5G7PYD7WWAMG
-          aws-secret-access-key: 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
+          aws-access-key-id: 
+          aws-secret-access-key: 
           aws-region: eu-north-1
 
       - name: Log in to Amazon ECR
@@ -43,7 +43,7 @@ jobs:
 
       - name: Build and Push Docker Image
         env:
-          ECR_REGISTRY: 272312907743.dkr.ecr.eu-north-1.amazonaws.com
+          ECR_REGISTRY: 
           ECR_REPOSITORY: parkguard-ecs-staging
           IMAGE_TAG: ${{ steps.set_tag.outputs.IMAGE_TAG }}
         run: |
